@@ -7,11 +7,13 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setResult(null);
     setLoading(true);
-    const data = new FormData(e.target);
-    const res = await fetch('/api/zip-crack', {
-      method: 'POST',
-      body: data
+
+    const form = new FormData(e.target);
+    const res = await fetch("/api/zip-crack", {
+      method: "POST",
+      body: form,
     });
     const json = await res.json();
     setResult(json);
@@ -19,19 +21,50 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-8">
-      <h1 className="text-2xl font-bold mb-4">ZIP Password Brute Force (Demo)</h1>
-      <form onSubmit={handleSubmit} className="mb-4" encType="multipart/form-data">
-        <input type="file" name="zipfile" accept=".zip" required className="mb-2" />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Cari Password</button>
-      </form>
-      {loading && <div>Mencari password, mohon tunggu...</div>}
-      {result && (
-        <div className="mt-4">
-          <div>Hasil: {result.password ? <b>Password ditemukan: {result.password}</b> : "Password tidak ditemukan (coba password max 3 karakter)"}</div>
-          <div>Password diuji: {result.tested}</div>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          ZIP Password Brute Force
+        </h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="file"
+            name="zipfile"
+            accept=".zip"
+            required
+            className="border w-full rounded p-2"
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-xl font-semibold hover:bg-blue-700 transition"
+            disabled={loading}
+          >
+            {loading ? "Mencari password..." : "Cari Password"}
+          </button>
+        </form>
+        <div className="mt-6 text-center">
+          {result && (
+            <>
+              {result.password ? (
+                <div className="text-green-700 font-bold">
+                  Password ditemukan: <span className="font-mono">{result.password}</span>
+                </div>
+              ) : (
+                <div className="text-red-600">
+                  Password **tidak ditemukan** (uji max 3 karakter)
+                </div>
+              )}
+              <div className="text-sm mt-2 text-gray-600">
+                Jumlah kombinasi diuji: {result.tested}
+              </div>
+            </>
+          )}
         </div>
-      )}
+        <div className="text-xs mt-6 text-gray-400 text-center">
+          Limit demo: Password max 3 karakter (huruf & angka).<br />
+          Untuk password panjang, jalankan brute-force di PC/Laptop.
+        </div>
+      </div>
     </div>
   );
-      }
+}
